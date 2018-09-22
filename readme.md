@@ -20,20 +20,6 @@
     <li>
         Выполнить: <strong>php artisan db:seed</strong>
     </li>     
-    <li>
-        Создать следующие файлы:
-        <ul>
-            <li>
-                <strong>public/favicon.ico</strong>
-            </li>
-            <li>
-                <strong>public/.htaccess</strong>
-            </li>                       
-        </ul>        
-    </li>
-    <li>
-        Из файла <strong>.gitignore</strong> удалить все вышеперечисленные пути
-    </li>
     <li>Вставить <strong>GeoLite2-City.mmdb</strong> и <strong>GeoLite2-Country.mmdb</strong> в папку <strong>storage/app/public/geolite/</strong>
     </li>
 </ul>
