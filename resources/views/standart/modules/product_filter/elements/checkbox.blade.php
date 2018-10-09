@@ -1,4 +1,4 @@
-@foreach($filter['values'] as $id => $value)
+@foreach($filter['values'] as $id =>$value)
     @if($loop->index%2 == 0 || $loop->index == 0)
         <div class="row">
             @endif
@@ -6,10 +6,10 @@
                 <label class="small">
                     <input
                             type="checkbox"
-                            name="{{$alias}}[{{$id}}]"
+                            name="{{$filter['alias']}}[{{$id}}]"
                             data-filter-type="{{$filter['type']}}"
                             data-filter-value="{{$id}}"
-                            data-filter-name="{{$alias}}"
+                            data-filter-name="{{$filter['alias']}}"
                             @php
                                 if(isset($filter['old_values']) && in_array($id, $filter['old_values']))
                                     echo 'checked';

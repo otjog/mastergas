@@ -32,25 +32,25 @@
 <!-- Right Column -->
 <div class="col-lg-5 order-3">
     <div class="product_description">
-        <div class="product_category">{{$product->category->name}}</div>
+        <div class="product_category">{{$product->category['name']}}</div>
         <div class="product_scu">Артикул: {{$product->scu}}</div>
         <h1 class="product_name">{{$product->name}}</h1>
 
-        @isset($product->prices[0]->value)
+        @if( isset($product->price['value']) && $product->price['value'] !== null)
 
-            @if( isset($product->prices[0]->sale) && $product->prices[0]->sale > 0)
+            @if( isset($product->price['sale']) && $product->price['sale'] > 0)
 
                 <div class="product_price text-muted mr-3 clearfix">
                     <s>
-                        <small>{{$product->prices[0]->value + $product->prices[0]->sale}}</small><small>руб</small>
+                        <small>{{$product->price['value'] + $product->price['sale']}}</small><small>{{$components['shop']['currency']['symbol']}}</small>
                     </s>
                 </div>
 
             @endif
 
             <div class="product_price clearfix">
-                {{ $product->prices[0]->value }}
-                <small>руб</small>
+                {{ $product->price['value'] }}
+                <small>{{$components['shop']['currency']['symbol']}}</small>
             </div>
 
             <div class="my-2 d-flex flex-row">
@@ -58,9 +58,10 @@
 
                     <div class="product_quantity">
                         <span>Кол-во: </span>
-                        <input type="text"      name="quantity" value="1" size="5" pattern="[0-9]*" class="quantity_input">
-                        <input type="hidden"    name="id"       value="{{$product->id}}">
-                        <input type="hidden"    name="_token"   value="{{csrf_token()}}">
+                        <input type="text"      name="quantity"     value="1" size="5" pattern="[0-9]*" class="quantity_input">
+                        <input type="hidden"    name="product_id"   value="{{$product->id}}">
+                        <input type="hidden"    name="_token"       value="{{csrf_token()}}">
+
                         <div class="quantity_buttons">
                             <div
                                     class="quantity_inc quantity_control"
@@ -75,13 +76,44 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="button_container">
                         <button type="submit" class="button cart_button">Купить</button>
                     </div>
 
+                    @if( isset($product->basket_parameters) && count($product->basket_parameters) > 0)
+                        <div class="order_parameters my-3 float-left">
+                            @foreach($product->basket_parameters as $key => $parameter)
+                                @if($key === 0 || $product->basket_parameters[$key -1 ]->name !== $parameter->name)
+                                    <strong>{{$parameter->name}}: </strong>
+                                @endif
+
+                                <div class="form-check form-check-inline">
+                                    <div class="custom-control custom-radio">
+                                        <input
+                                                class="custom-control-input"
+                                                type="radio"
+                                                required=""
+                                                name="order_attributes[]"
+                                                id="{{ $parameter->pivot->id }}"
+                                                value="{{ $parameter->pivot->id }}"
+                                        >
+                                        <label class="custom-control-label" for="{{ $parameter->pivot->id }}">{{$parameter->pivot->value }}</label>
+                                    </div>
+
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
                 </form>
             </div>
-        @endisset
+
+        @else
+            <div class="alert alert-warning">
+                Мы не смогли отобразить цену. Позвоните нам и мы всё исправим.
+            </div>
+        @endif
 
         <div class="my-4 py-3 border-top">
 
@@ -125,6 +157,23 @@
         <div class="tab-data data-description">
             @if(isset( $product->description ))
                 <p>{{ $product->description }}</p>
+            @endif
+
+            @if( isset($product->parameters) && count($product->parameters) > 0)
+                <ul class="list-unstyled">
+                    @foreach($product->parameters as $key => $parameter)
+
+                        <li>
+                            @if($key === 0 || $product->parameters[$key -1 ]->name !== $parameter->name)
+                                <strong>{{$parameter->name}}: </strong>
+                            @endif
+
+                            <span class="text-muted">{{$parameter->pivot->value}}</span>
+                        </li>
+
+                    @endforeach
+                </ul>
+
             @endif
         </div>
 
