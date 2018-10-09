@@ -8,7 +8,7 @@ use App\Models\Shop\Order\Basket;
 use Illuminate\Http\Request;
 use App\Models\Shop\Category\Category;
 use App\Models\Shop\Product\Product;
-
+use App\Models\Settings;
 class CategoryController extends Controller{
 
     protected $categories;
@@ -19,8 +19,6 @@ class CategoryController extends Controller{
 
     protected $metaTagsCreater;
 
-    protected $template_name;
-
     /**
      * Создание нового экземпляра контроллера.
      *
@@ -29,7 +27,9 @@ class CategoryController extends Controller{
      */
     public function __construct(Category $categories, Basket $baskets, MetaTagsCreater $metaTagsCreater){
 
-        $this->template_name = env('SITE_TEMPLATE');
+        $settings = Settings::getInstance();
+
+        $this->data = $settings->getParameters();
 
         $this->categories       = $categories;
 
@@ -37,15 +37,9 @@ class CategoryController extends Controller{
 
         $this->metaTagsCreater  = $metaTagsCreater;
 
-        $this->data             = [
-            'template'  => [
-                'component'     => 'shop',
-                'resource'      => 'category',
-                ],
-            'data'      => [
-                'product_chunk' => 3
-            ],
-            'template_name' => $this->template_name
+        $this->data['template'] = [
+            'component' => 'shop',
+            'resource'  => 'category',
         ];
 
     }
@@ -103,12 +97,19 @@ class CategoryController extends Controller{
         $this->data['data']     ['category']            = $category;
         $this->data['data']     ['children_categories'] = $this->categories->getActiveChildrenCategories($id);
         $this->data['data']     ['header_page']         = $category[0]->name;
+        $this->data['data']     ['parameters']          = [];
 
         $this->data['template']['custom'][] = 'shop-icons';
 
         if( count( $request->query ) > 0 ){
 
-            $this->data['data'] ['products'] = $products->getFilteredProducts($request->toArray());
+            $parameters = $request->toArray();
+
+            $parameters['category'] = $id;
+
+            $this->data['data'] ['products'] = $products->getFilteredProducts($parameters);
+
+            $this->data['data'] ['parameters'] = $request->toArray();
 
         }else{
 
